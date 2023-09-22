@@ -1,0 +1,45 @@
+## **Part One: Solidify Terminology**
+
+In your own terms, define the following terms:
+
+- What is HTTP?
+
+http is one of the internet protocols (others are https or ftp for example). http stands for hypertext transfer protocol. It's a request-response protocol in a client-server model.
+
+- What is a URL?
+
+URL stands for uniform resource locator. Also called an address. It’s a reference to a resource on the web (e.g. server) with the location of the resource and a mechanism of retrieving it.
+
+- What is DNS?
+
+DNS - domain name system. Is a system for making IP numerical representation readable for humans. It “translates” an IP address into a string of characters that usually are meaningful to humans and relatively short.
+
+- What is a query string
+Query string is everything that follows the “?” in the snippet below:
+https://www.google.com/search?q=cat&
+It provides additional instructions to a HTML request. It’s a part of URL and assigns values to specific parameters that are then used when handling the HTML request.
+
+- What are two HTTP verbs and how are they different?
+Two most popular/main HTTP verbs are
+GET - request that doesn’t have side effect (e.g., doesn’t modify the server)
+POST -request that has side effects (modifies the server)
+
+- What is an HTTP request?
+When a user interacts with a web app, the web browser (client) makes several http requests to the server that define the behavior and rendering of the web page. Http request describes a desired action on the server side.
+
+- What is an HTTP response?
+HTTP response is an “instruction” sent by the server in response to the HTTP request that is then processed by the web browser (client) and rendered in the web browser window.
+
+- What is an HTTP header? Give a couple examples of request and response headers you have seen.
+When you go on the internet, your browser and the websites you visit send little invisible notes to each other called HTTP headers. These notes, which you usually don't see, help the website and your browser understand how to talk to each other. They share instructions about how to show information, check who's visiting, and decide how to manage the data being shared. These little notes ensure that your browser and the website can work together properly.
+
+- What are the processes that happen when you type “http://somesite.com/some/page.html” into a browser?
+
+URL Parsing to identify the protocol, domain name, path
+DNS Lookup
+Establishing a connection with the server
+HTTP Request
+Server Processing
+HTTP Response
+Page Rendering
+Connection Closure
