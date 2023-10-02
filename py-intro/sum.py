@@ -12,6 +12,10 @@ def sum_nums(nums):
     # want you to use it. Please write this by hand.
 
     # YOUR CODE HERE
+    aggregator= 0;
+    for num in nums:
+      aggregator += num
+    return aggregator
 
 
 print("sum_nums returned", sum_nums([1, 2, 3, 4]))

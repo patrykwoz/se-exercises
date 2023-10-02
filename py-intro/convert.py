@@ -16,6 +16,19 @@ def convert_temp(unit_in, unit_out, temp):
     """
 
     # YOUR CODE HERE
+    if unit_in == "c" and unit_out == "f":
+        # Convert Celsius to Fahrenheit
+        return (temp * 9/5) + 32
+    elif unit_in == "f" and unit_out == "c":
+        # Convert Fahrenheit to Celsius
+        return (temp - 32) * 5/9
+    elif unit_in == unit_out:
+        # Return the same temperature if units are the same
+        return temp
+    else:
+        # Handle invalid units
+        return f"Invalid unit {unit_in if unit_in not in ['c', 'f'] else unit_out}"
+
 
 
 print("c", "f", 0, convert_temp("c", "f", 0), "should be 32.0")
