@@ -13,3 +13,12 @@ def find_the_duplicate(nums):
         >>> find_the_duplicate([2, 1, 3, 4]) is None
         True
     """
+    
+    if len(set(nums))==len(nums):
+        return None
+    trackDups = {num:nums.count(num) for num in nums}
+    dups = []
+    for num, count in trackDups.items():
+        if count >= 2:
+            dups.append(num)
+    return dups[0]

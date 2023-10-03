@@ -11,3 +11,4 @@ def remove_every_other(lst):
         >>> lst
         [1, 2, 3, 4, 5]
     """
+    return [item for i,item in enumerate(lst) if i%2==0]
