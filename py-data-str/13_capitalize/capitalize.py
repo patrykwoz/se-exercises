@@ -7,3 +7,7 @@ def capitalize(phrase):
         >>> capitalize('only first word')
         'Only first word'
     """
+    splitPhrase = phrase.split(' ')
+    splitPhrase[0] = splitPhrase[0].capitalize()
+
+    return  ' '.join(splitPhrase)

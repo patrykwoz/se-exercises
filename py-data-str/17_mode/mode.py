@@ -11,3 +11,7 @@ def mode(nums):
         >>> mode([2, 2, 3, 3, 2])
         2
     """
+    frequency = {num:nums.count(num) for num in nums}
+    return max(frequency, key=frequency.get)
+
+

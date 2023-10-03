@@ -16,3 +16,4 @@ def friend_date(a, b):
         >>> friend_date(sauron, gandalf)
         True
     """
+    return any(hobby in b[2] for hobby in a[2])
