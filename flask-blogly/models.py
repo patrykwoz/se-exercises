@@ -38,6 +38,16 @@ class User(db.Model):
         """Get all user matching that type/permissions."""
 
         return cls.query.filter_by(type=type).all()
+    
+    @property
+    def full_name(self):
+        """Return the full name of the user."""
+        return f"{self.first_name} {self.last_name}"
+    
+    @classmethod
+    def sorted_query(self):
+        return self.query.order_by(self.first_name, self.last_name).all()
+        
 
 #Cute dog
 #https://images.unsplash.com/photo-1548253172-369bc1121857?auto=format&fit=crop&q=80&w=1964&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
