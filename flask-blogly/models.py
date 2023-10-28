@@ -11,40 +11,33 @@ def connect_db(app):
     db.app = app
     db.init_app(app)
 
+def default_img_url():
+    return "https://images.unsplash.com/photo-1599272771314-f3ec16bda3f2?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
 
-class Pet(db.Model):
+
+class User(db.Model):
     """Pet."""
 
-    __tablename__ = "pets"
+    __tablename__ = "users"
 
-    id = db.Column(db.Integer,
-                   primary_key=True,
-                   autoincrement=True)
-    name = db.Column(db.String(50),
-                     nullable=False,
-                     unique=True)
-    species = db.Column(db.String(30), nullable=True)
-    hunger = db.Column(db.Integer, nullable=False, default=20)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    first_name = db.Column(db.String(50), nullable=False, unique=False)
+    last_name = db.Column(db.String(50), nullable=False, unique=False)
+    user_type = db.Column(db.String(10), nullable=False, unique=False, default='admin')
+    img_url = db.Column(db.String(255), nullable=False, default=default_img_url)
 
-    def greet(self):
-        """Greet using name."""
-
-        return f"I'm {self.name} the {self.species or 'thing'}"
-
-    def feed(self, units=10):
-        """Nom nom nom."""
-
-        self.hunger -= units
-        self.hunger = max(self.hunger, 0)
-
+    
     def __repr__(self):
         """Show info about pet."""
 
-        p = self
-        return f"<Pet {p.id} {p.name} {p.species} {p.hunger}>"
+        u = self
+        return f"<User {u.id} {u.first_name} {u.last_name} {u.user_type}>"
 
     @classmethod
-    def get_by_species(cls, species):
-        """Get all pets matching that species."""
+    def get_by_type(cls, type):
+        """Get all user matching that type/permissions."""
 
-        return cls.query.filter_by(species=species).all()
+        return cls.query.filter_by(type=type).all()
+
+#Cute dog
+#https://images.unsplash.com/photo-1548253172-369bc1121857?auto=format&fit=crop&q=80&w=1964&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
