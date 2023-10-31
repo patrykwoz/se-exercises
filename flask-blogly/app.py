@@ -1,7 +1,7 @@
 """Demo app using SQLAlchemy."""
 
 from flask import Flask, request, redirect, render_template, flash
-from models import db, connect_db, User
+from models import db, connect_db, User, Post
 import pdb
 
 
@@ -50,9 +50,9 @@ def add_user():
 @app.route("/users/<int:user_id>")
 def show_user_details(user_id):
     """Show info on a single user."""
-
+    posts= Post.query.filter_by(user_id=user_id).all()
     user = User.query.get_or_404(user_id)
-    return render_template("detail.html", user=user)
+    return render_template("detail.html", user=user, posts=posts)
 
 @app.route("/users/<int:user_id>/edit")
 def render_edit_user(user_id):
@@ -87,3 +87,66 @@ def delete_user(user_id):
     flash('User deleted successfully!', 'success')
 
     return redirect("/users")
+
+@app.route("/users/<int:user_id>/posts/new")
+def render_new_post(user_id):
+    user = User.query.get_or_404(user_id)
+    return render_template("/new_post.html", user=user)
+
+@app.route("/users/<int:user_id>/posts/new", methods=["POST"])
+def add_post(user_id):
+
+    post_title = request.form.get('post_title')
+    post_content = request.form.get('post_content')
+
+    post = Post(title=post_title, content=post_content, user_id=user_id)
+    
+    db.session.add(post)
+    db.session.commit()
+    return redirect(f"/users/{user_id}")
+
+
+@app.route('/users/<int:user_id>/posts/cancel')
+def handle_post_cancel(user_id):
+
+    return redirect(f"/users/{user_id}")
+
+@app.route('/posts/<int:post_id>')
+def render_post_detail(post_id):
+
+    post = Post.query.get_or_404(post_id)
+    user= User.query.get_or_404(post.user_id)
+    
+    return render_template('/post_detail.html', post=post, user=user)
+
+@app.route('/posts/<int:post_id>/edit')
+def render_edit_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    return render_template('/edit_post.html', post=post)
+
+@app.route('/posts/<int:post_id>/edit', methods=["POST"])
+def edit_post(post_id):
+
+    post = Post.query.get_or_404(post_id)
+    post.title = request.form.get('post_title')
+    post.content = request.form.get('post_content')
+    user= User.query.get_or_404(post.user_id)
+    db.session.add(post)
+    db.session.commit()
+    
+    return redirect(f"/posts/{post_id}")
+
+@app.route('/posts/<int:post_id>/cancel')
+def cancel_edit_post(post_id):
+    return redirect(f"/posts/{post_id}")
+
+
+@app.route("/posts/<int:post_id>/delete", methods=["POST"])
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    user_id = post.user_id
+    db.session.delete(post)
+    db.session.commit()
+    flash('Post deleted successfully!', 'success')
+
+    return redirect(f"/users/{user_id}")

@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from sqlalchemy.orm import sessionmaker
 from app import app
-from models import db, User
+from models import db, User, Post
 import pdb
 
 # Use test database and don't clutter tests with SQL
@@ -39,15 +39,21 @@ class UserViewsTestCase(TestCase):
         """Add sample user."""
 
         User.query.delete()
+        Post.query.delete()
 
         img_url = "https://images.unsplash.com/photo-1497752531616-c3afd9760a11?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
 
         user = User(first_name="Mack III", last_name="TheBear", user_type="user", img_url=img_url)
+        post = Post(title="Test Title", content="Test Content", user_id=1)
         db.session.add(user)
         db.session.commit()
+        db.session.add(post)
+        db.session.commit()
+
 
         self.img_url = img_url
         self.user_id = user.id
+        self.post_id = post.id
 
     def tearDown(self):
         """Clean up any fouled transaction."""
@@ -85,3 +91,11 @@ class UserViewsTestCase(TestCase):
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('User deleted successfully!', html)
+    def test_add_post(self):
+        with app.test_client() as client:
+            d = {'title':"My Post", 'content':"My Content", 'user_id':1}
+            resp = client.post("/users/1/posts/new", data=d, follow_redirects=True)
+            html = resp.get_data(as_text=True)
+            #pdb.set_trace()
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("My Post", html)

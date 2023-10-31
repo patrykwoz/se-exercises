@@ -16,6 +16,19 @@
                 <button>Delete</button>
             </form>
         </div>
+        <h4>Posts</h4>
+        <div class="post_container">
+            <ul>
+                {% for post in posts %}
+                <li><a href="/posts/{{ post.id }}">{{ post.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="buttons-container">
+            <a href="/users/{{ user.id }}/posts/new"><button>Add post</button></a>
+        </div>
+        
+
     </div>
 
 

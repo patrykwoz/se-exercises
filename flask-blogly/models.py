@@ -1,6 +1,7 @@
 """Demo file showing off a model for SQLAlchemy."""
 
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -16,7 +17,7 @@ def default_img_url():
 
 
 class User(db.Model):
-    """Pet."""
+    """User."""
 
     __tablename__ = "users"
 
@@ -28,7 +29,7 @@ class User(db.Model):
 
     
     def __repr__(self):
-        """Show info about pet."""
+        """Show info about user."""
 
         u = self
         return f"<User {u.id} {u.first_name} {u.last_name} {u.user_type}>"
@@ -48,6 +49,23 @@ class User(db.Model):
     def sorted_query(self):
         return self.query.order_by(self.first_name, self.last_name).all()
         
-
 #Cute dog
 #https://images.unsplash.com/photo-1548253172-369bc1121857?auto=format&fit=crop&q=80&w=1964&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
+
+
+class Post(db.Model):
+    """Post."""
+
+    __tablename__ = "posts"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(50), nullable=False, unique=False)
+    content = db.Column(db.String(150), nullable=False, unique=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    user = db.relationship('User')
+
+    def __repr__(self):
+        post_user_info = f"user:{self.user.full_name} id:{self.user_id}" if self.user else "<no associated user>"
+        return f"<Post {self.title} created by {post_user_info}.>"

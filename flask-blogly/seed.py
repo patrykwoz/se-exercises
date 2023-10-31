@@ -1,6 +1,6 @@
 """Seed file to make sample data for users db."""
 
-from models import User, db
+from models import User, Post, db
 #from app import app
 #import app
 
@@ -17,9 +17,17 @@ ryan = User(first_name='Ryan', last_name='TheBear', user_type="admin", img_url="
 elizabeth = User(first_name='Queen', last_name='Elizabeth', user_type="royal", img_url="https://images.unsplash.com/photo-1516934024742-b461fba47600?auto=format&fit=crop&q=80&w=1887&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
 
 # Add new objects to session, so they'll persist
-db.session.add(mack)
-db.session.add(ryan)
-db.session.add(elizabeth)
+db.session.add_all([mack, ryan, elizabeth])
 
 # Commit--otherwise, this never gets saved!
+db.session.commit()
+
+# Add posts
+post1 = Post(title="Mack's first post", content="Some text that I'm working on...", user_id=1)
+post2 = Post(title="Mack's second post", content="Some more text that I'm working on...", user_id=1)
+post3 = Post(title="Ryan's greatest story", content="I really love seals.", user_id=2)
+post4 = Post(title="Service Birds's weird post", content="I don't know what to post...KA!")
+
+db.session.add_all([post1, post2, post3, post4])
+
 db.session.commit()

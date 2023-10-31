@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}User Detail{% endblock %}
+
+{% block content %}
+    <h1><a href="/">Blogly</a></h1>
+    <h2>Post Detail Page</h2>
+
+    <div class="post-container">
+        <h3>{{ post.title }}</h3>
+        <p>{{ post.content }}</p>
+        <div class="buttons-container">
+            <a href="/users/{{ user.id }}"><button>Cancel</button></a>
+            <a href="/posts/{{ post.id }}/edit"><button>Edit</button></a>
+            <form action="/posts/{{ post.id }}/delete" method="POST" id="detail_post">
+                <button>Delete</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+
