@@ -1,72 +1,77 @@
 from unittest import TestCase
-
 from sqlalchemy.orm import sessionmaker
 from app import app
 from models import db, User, Post
 import pdb
 
-# Use test database and don't clutter tests with SQL
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///test_blogly_db'
-app.config['SQLALCHEMY_ECHO'] = False
-
-# Make Flask errors be real errors, rather than HTML pages with error info
-app.config['TESTING'] = True
-
-# This is a bit of hack, but don't use Flask DebugToolbar
-app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
+# Constants
+TEST_DB_URI = 'postgresql:///test_blogly_db'
+IMG_URL = "https://images.unsplash.com/photo-1497752531616-c3afd9760a11?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
 
 
+def configure_app():
+    """Configure Flask application."""
+    app.config['SQLALCHEMY_DATABASE_URI'] = TEST_DB_URI
+    app.config['SQLALCHEMY_ECHO'] = False
+    app.config['TESTING'] = True
+    app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
 
 
-ctx = app.app_context()
-ctx.push()
-engine = db.engine
-connection = engine.connect()
-
-Session = sessionmaker(bind=engine)
-session = Session()
-
-db.drop_all()
-db.create_all()
-
-#app.config['SECRET_KEY'] = "SECRET!"
+def init_db(cls):
+    """Initialize the database."""
+    with app.app_context():
+        engine = db.engine
+        connection = engine.connect()
+        cls.session = sessionmaker(bind=db.engine)()
+        db.drop_all()
+        db.create_all()
 
 
 class UserViewsTestCase(TestCase):
     """Tests for views for Users."""
 
+    @classmethod
+    def setUpClass(cls):
+        """Run once before all test methods."""
+        configure_app()
+        init_db(cls)
+        
+        
+
     def setUp(self):
         """Add sample user."""
+        with app.app_context():
+            User.query.delete()
+            Post.query.delete()
 
-        User.query.delete()
-        Post.query.delete()
+            user = User(first_name="Mack III", last_name="TheBear", user_type="user", img_url=IMG_URL)
+            post = Post(title="Test Title", content="Test Content", user=user)
 
-        img_url = "https://images.unsplash.com/photo-1497752531616-c3afd9760a11?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            db.session.add_all([user, post])
+            db.session.commit()
 
-        user = User(first_name="Mack III", last_name="TheBear", user_type="user", img_url=img_url)
-        post = Post(title="Test Title", content="Test Content", user_id=1)
-        db.session.add(user)
-        db.session.commit()
-        db.session.add(post)
-        db.session.commit()
-
-
-        self.img_url = img_url
-        self.user_id = user.id
-        self.post_id = post.id
+            self.user = user
+            self.user_id = user.id
+            self.post_id = post.id
 
     def tearDown(self):
         """Clean up any fouled transaction."""
+        with app.app_context():
+            db.session.rollback()
 
-        db.session.rollback()
+    @classmethod
+    def tearDownClass(cls):
+        """Run once after all test methods."""
+        cls.session.close()
 
     def test_list_users(self):
         with app.test_client() as client:
-            resp = client.get("/", follow_redirects=True)
+            resp = client.get("/users", follow_redirects=True)
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('Mack III', html)
+
 
     def test_show_user(self):
         with app.test_client() as client:
@@ -78,7 +83,7 @@ class UserViewsTestCase(TestCase):
 
     def test_add_user(self):
         with app.test_client() as client:
-            d = {'first_name':"Mack IV", 'last_name':"TheBear", 'user_type':"user", 'img_url':self.img_url}
+            d = {'first_name':"Mack IV", 'last_name':"TheBear", 'user_type':"user", 'img_url':IMG_URL}
             resp = client.post("/users/new", data=d, follow_redirects=True)
             html = resp.get_data(as_text=True)
             #pdb.set_trace()
@@ -93,7 +98,7 @@ class UserViewsTestCase(TestCase):
             self.assertIn('User deleted successfully!', html)
     def test_add_post(self):
         with app.test_client() as client:
-            d = {'title':"My Post", 'content':"My Content", 'user_id':1}
+            d = {'post_title':"My Post", 'post_content':"My Content", 'user':self.user}
             resp = client.post("/users/1/posts/new", data=d, follow_redirects=True)
             html = resp.get_data(as_text=True)
             #pdb.set_trace()

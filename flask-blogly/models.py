@@ -1,7 +1,8 @@
 """Demo file showing off a model for SQLAlchemy."""
 
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timezone
+import pytz
 
 db = SQLAlchemy()
 
@@ -27,7 +28,6 @@ class User(db.Model):
     user_type = db.Column(db.String(10), nullable=False, unique=False, default='admin')
     img_url = db.Column(db.String(255), nullable=False, default=default_img_url)
 
-    
     def __repr__(self):
         """Show info about user."""
 
@@ -61,8 +61,14 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(50), nullable=False, unique=False)
     content = db.Column(db.String(150), nullable=False, unique=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    date =datetime.utcnow()
+    created_at = db.Column(db.DateTime, default=date)
+    local_tz = pytz.timezone('America/New_York')
+    local_time = date.replace(tzinfo=timezone.utc).astimezone(local_tz)
+    formatted_time = local_time.strftime('%A %B %d, %Y, %I:%M %p')
+    created_at_friendly = db.Column(db.String(150), nullable=False, unique=False, default=formatted_time)
+    
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
 
     user = db.relationship('User')
 

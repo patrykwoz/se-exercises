@@ -26,7 +26,6 @@ db.session.commit()
 post1 = Post(title="Mack's first post", content="Some text that I'm working on...", user_id=1)
 post2 = Post(title="Mack's second post", content="Some more text that I'm working on...", user_id=1)
 post3 = Post(title="Ryan's greatest story", content="I really love seals.", user_id=2)
-post4 = Post(title="Service Birds's weird post", content="I don't know what to post...KA!")
 
 db.session.add_all([post1, post2, post3, post4])
 

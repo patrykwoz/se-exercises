@@ -5,6 +5,7 @@ from models import db, connect_db, User, Post
 import pdb
 
 
+
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///blogly_db'
@@ -17,7 +18,10 @@ app.config['SECRET_KEY'] = "SECRET!"
 
 @app.route("/")
 def render_home():
-    return redirect('/users')
+
+    posts = Post.query.all()
+
+    return render_template('/home.html', posts=posts)
 
 @app.route("/users")
 def list_users():
@@ -100,7 +104,6 @@ def add_post(user_id):
     post_content = request.form.get('post_content')
 
     post = Post(title=post_title, content=post_content, user_id=user_id)
-    
     db.session.add(post)
     db.session.commit()
     return redirect(f"/users/{user_id}")

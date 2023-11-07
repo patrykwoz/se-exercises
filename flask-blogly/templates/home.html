@@ -4,6 +4,18 @@
 
 {% block content %}
     <h1><a href="/">Blogly</a></h1>
+    <a href="/users">Users</a>
+    <h2>Recent posts</h2>
+    <ul>
+        {% for post in posts %}
+        <li class="post-container">
+            <a href="/posts/{{ post.id }}">{{ post.title }}</a>
+            <p>{{ post.content }}</p>
+            <p>Post by {{ post.user.full_name }} on {{ post.created_at_friendly }}</p>
+        </li>
+
+        {% endfor %}
+    </ul>
 
 
 
