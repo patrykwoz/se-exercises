@@ -49,10 +49,6 @@ class User(db.Model):
     def sorted_query(self):
         return self.query.order_by(self.first_name, self.last_name).all()
         
-#Cute dog
-#https://images.unsplash.com/photo-1548253172-369bc1121857?auto=format&fit=crop&q=80&w=1964&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
-
-
 class Post(db.Model):
     """Post."""
 
@@ -75,3 +71,23 @@ class Post(db.Model):
     def __repr__(self):
         post_user_info = f"user:{self.user.full_name} id:{self.user_id}" if self.user else "<no associated user>"
         return f"<Post {self.title} created by {post_user_info}.>"
+
+class Tag(db.Model):
+    """Tag."""
+    __tablename__="tags"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(50), nullable=False, unique=True)
+    posts = db.relationship('Post', secondary='posts_tags', backref='tags')
+
+    @classmethod
+    def sorted_query(self):
+        return self.query.order_by(self.name).all()
+
+class PostTag(db.Model):
+    """PostTagg."""
+    __tablename__="posts_tags"
+
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), primary_key=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey("tags.id"), primary_key=True)
+

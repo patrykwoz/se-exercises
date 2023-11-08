@@ -1,7 +1,7 @@
 from unittest import TestCase
 from sqlalchemy.orm import sessionmaker
 from app import app
-from models import db, User, Post
+from models import db, User, Post, Tag, PostTag
 import pdb
 
 # Constants
@@ -104,3 +104,11 @@ class UserViewsTestCase(TestCase):
             #pdb.set_trace()
             self.assertEqual(resp.status_code, 200)
             self.assertIn("My Post", html)
+    def test_add_tag(self):
+        with app.test_client() as client:
+            d = {'tag_name':"animals"}
+            resp = client.post("/tags/new", data=d, follow_redirects=True)
+            html = resp.get_data(as_text=True)
+            #pdb.set_trace()
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("animals", html)

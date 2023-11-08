@@ -1,7 +1,7 @@
 """Demo app using SQLAlchemy."""
 
 from flask import Flask, request, redirect, render_template, flash
-from models import db, connect_db, User, Post
+from models import db, connect_db, User, Post, Tag, PostTag
 import pdb
 
 
@@ -18,8 +18,8 @@ app.config['SECRET_KEY'] = "SECRET!"
 
 @app.route("/")
 def render_home():
-
     posts = Post.query.all()
+    tags = Tag.sorted_query()
 
     return render_template('/home.html', posts=posts)
 
@@ -95,17 +95,23 @@ def delete_user(user_id):
 @app.route("/users/<int:user_id>/posts/new")
 def render_new_post(user_id):
     user = User.query.get_or_404(user_id)
-    return render_template("/new_post.html", user=user)
+    tags = Tag.sorted_query()
+    return render_template("/new_post.html", user=user, tags=tags)
 
 @app.route("/users/<int:user_id>/posts/new", methods=["POST"])
 def add_post(user_id):
 
     post_title = request.form.get('post_title')
     post_content = request.form.get('post_content')
-
+    post_tags = request.form.getlist('tags')
+    tags = Tag.query.filter(Tag.id.in_(post_tags)).all()
     post = Post(title=post_title, content=post_content, user_id=user_id)
+    for tag in tags:
+        post.tags.append(tag)
     db.session.add(post)
     db.session.commit()
+
+
     return redirect(f"/users/{user_id}")
 
 
@@ -125,19 +131,35 @@ def render_post_detail(post_id):
 @app.route('/posts/<int:post_id>/edit')
 def render_edit_post(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template('/edit_post.html', post=post)
+    tags = Tag.sorted_query()
+    return render_template('/edit_post.html', post=post, tags=tags)
 
 @app.route('/posts/<int:post_id>/edit', methods=["POST"])
 def edit_post(post_id):
-
     post = Post.query.get_or_404(post_id)
     post.title = request.form.get('post_title')
     post.content = request.form.get('post_content')
-    user= User.query.get_or_404(post.user_id)
-    db.session.add(post)
-    db.session.commit()
-    
-    return redirect(f"/posts/{post_id}")
+
+    # Get current tag IDs from the form as integers
+    current_tag_ids = list(map(int, request.form.getlist('tags')))
+    # Get tag objects for the current tags
+    current_tags = Tag.query.filter(Tag.id.in_(current_tag_ids)).all()
+
+    # Add new tags and remove unselected tags
+    post.tags = [tag for tag in current_tags if tag not in post.tags] + \
+                [tag for tag in post.tags if tag.id in current_tag_ids]
+
+    # Assuming 'post.user_id' is valid and 'User' is the user model
+    user = User.query.get_or_404(post.user_id)
+
+    # No need to add 'post' to the session as it's already tracked by SQLAlchemy
+    try:
+        db.session.commit()
+        return redirect(f"/posts/{post_id}")
+    except Exception as e:
+        db.session.rollback()  
+        return str(e), 500  
+
 
 @app.route('/posts/<int:post_id>/cancel')
 def cancel_edit_post(post_id):
@@ -153,3 +175,79 @@ def delete_post(post_id):
     flash('Post deleted successfully!', 'success')
 
     return redirect(f"/users/{user_id}")
+
+@app.route("/tags")
+def show_tags():
+    """List all tags."""
+
+    tags = Tag.sorted_query()
+    return render_template("tags.html", tags=tags)
+
+@app.route("/tags/<int:tag_id>")
+def show_tag_details(tag_id):
+    # post = Post.query.get_or_404(post_id)
+    # user= User.query.get_or_404(post.user_id)
+    tag = Tag.query.get_or_404(tag_id)
+    posts = tag.posts
+    
+    return render_template('/tag_detail.html', tag=tag, posts=posts)
+
+@app.route("/tags/new")
+def show_add_new_tag():
+    posts = Post.query.all()
+
+    return render_template('/new_tag.html', posts=posts)
+    
+
+@app.route("/tags/new", methods=["POST"])
+def handle_add_new_tag():
+    tag_name = request.form.get('tag_name')
+    tag_posts = request.form.getlist('posts')
+
+    tag = Tag(name=tag_name)
+
+    
+    posts = Post.query.filter(Post.id.in_(tag_posts)).all()
+    for post in posts:
+        tag.posts.append(post)
+
+
+    db.session.add(tag)
+    db.session.commit()
+    return redirect(f"/tags")
+
+@app.route("/tags/<int:tag_id>/edit")
+def show_edit_tag(tag_id):
+    tag = Tag.query.get_or_404(tag_id)
+    posts = Post.query.all()
+    return render_template('/edit_tag.html', tag=tag, posts=posts)
+
+@app.route("/tags/<int:tag_id>/edit", methods=["POST"])
+def handle_edit_tag(tag_id):
+    tag = Tag.query.get_or_404(tag_id)
+    tag.name = request.form.get('tag_name')
+
+    current_post_ids = list(map(int, request.form.getlist('posts')))
+    current_posts = Post.query.filter(Post.id.in_(current_post_ids)).all()
+
+    # Add new tags and remove unselected tags
+    tag.posts = [post for post in current_posts if post not in tag.posts] + \
+                [post for post in tag.posts if post.id in current_post_ids]
+
+
+    #db.session.add(tag)
+    try:
+        db.session.commit()
+        return redirect(f"/tags/{tag_id}")
+    except Exception as e:
+        db.session.rollback() 
+        return str(e), 500
+
+@app.route("/tags/<int:tag_id>/delete", methods=["POST"])
+def handle_delete_tag(tag_id):
+    tag = Tag.query.get_or_404(tag_id)
+    db.session.delete(tag)
+    db.session.commit()
+    flash('Tag deleted successfully!', 'success')
+
+    return redirect(f"/tags")

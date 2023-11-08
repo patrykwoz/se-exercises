@@ -3,15 +3,21 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <h1><a href="/">Blogly</a></h1>
-    <a href="/users">Users</a>
     <h2>Recent posts</h2>
     <ul>
         {% for post in posts %}
         <li class="post-container">
-            <a href="/posts/{{ post.id }}">{{ post.title }}</a>
+            <a class="post-title" href="/posts/{{ post.id }}">{{ post.title }}</a>
             <p>{{ post.content }}</p>
-            <p>Post by {{ post.user.full_name }} on {{ post.created_at_friendly }}</p>
+            <p class="post-meta">Post by {{ post.user.full_name }} on {{ post.created_at_friendly }}</p>
+            <div class="horizontal-container">
+                <p><b>Tags:</b></p>
+            <ul class="tags-container">
+                {% for tag in post.tags %}
+                <li class="tag-button">{{ tag.name }}</li>
+                {% endfor %}
+            </ul>
+            </div>
         </li>
 
         {% endfor %}

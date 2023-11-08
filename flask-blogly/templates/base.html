@@ -15,6 +15,12 @@
 </head>
 <body>
 
+    <h1><a href="/">Blogly</a></h1>
+    <div class="nav-bar">
+        <a href="/users">Users</a>
+        <a href="/tags">Tags</a>
+    </div>
+
     {% with messages = get_flashed_messages(category_filter=["success"]) %}
         {% for msg in messages %}
             <p class="success">{{ msg }}</p>

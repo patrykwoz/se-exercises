@@ -1,6 +1,6 @@
 """Seed file to make sample data for users db."""
 
-from models import User, Post, db
+from models import User, Post, Tag, PostTag, db
 #from app import app
 #import app
 
@@ -27,6 +27,16 @@ post1 = Post(title="Mack's first post", content="Some text that I'm working on..
 post2 = Post(title="Mack's second post", content="Some more text that I'm working on...", user_id=1)
 post3 = Post(title="Ryan's greatest story", content="I really love seals.", user_id=2)
 
-db.session.add_all([post1, post2, post3, post4])
+db.session.add_all([post1, post2, post3])
 
+db.session.commit()
+
+tag1 = Tag(name='beavers')
+
+db.session.add(tag1)
+db.session.commit()
+
+post1.tags.append(tag1)
+
+db.session.add(post1)
 db.session.commit()
