@@ -1,0 +1,74 @@
+*{
+    font-family: "DM Mono";
+}
+
+img{
+    width: 150px;
+    height: auto;
+}
+
+.success {
+    color: green;
+}
+
+ul{
+    padding: 0;
+}
+
+.post-container {
+    list-style-type: none;
+    margin: 0;
+    margin-bottom: 25px;
+    padding: 0;
+}
+
+.tags-container{
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+    padding: 0;
+}
+
+.tags-container li{
+    list-style-type: none;
+    color:white;
+    background-color: blue;
+    display: inline;
+    border: 1px solid blue;
+    border-radius: 5px;
+    padding: 0px;
+    margin-right: 5px;
+}
+
+.post-title {
+    font-size: large;
+    font-weight: bold;
+}
+
+.post-meta{
+    font-size: smaller;
+    /* font-weight: bold; */
+    color:gray;
+}
+
+.horizontal-container{
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+    padding: 0;
+    
+}
+.horizontal-container p{
+    display: inline;
+    margin: 0;
+    padding: 0;
+    
+}
+
+.available-container{
+    background-color:aquamarine;
+}
+
+.unavailable-container{
+    background-color:bisque;
+}
