@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <h2>Our cupcakes</h2>
+        <ul class="cupcakes-container">
+            {% for cupcake in cupcakes %}
+            
+            <li class="cupcake-container">
+                <a class="cupcake-flavor link" href="/cupcakes/{{ cupcake.id }}">
+                    <h3>{{ cupcake.flavor }}</h3>
+                    <img src="{{ cupcake.image }}" alt="This is a photo of a cupcake flavored {{ cupcake.flavor }} and size {{ cupcake.size }}">
+                </a>
+                <h4>{{ cupcake.size }}</h4>
+                <a href="/cupcakes/{{ cupcake.id }}/edit">Edit</a>
+                <form action="/cupcakes/{{ cupcake.id }}/delete" method="POST"><button class="warning">Delete</button></form>
+            </li>
+            {% endfor %}
+        </ul>   
+
+        
+    
+
+
+
+{% endblock %}

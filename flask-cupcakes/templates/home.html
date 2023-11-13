@@ -3,49 +3,30 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <h2>Our pets</h2>
-        <ul class="available-container">
-            {% for pet in pets %}
-
-            {% if pet.available %}
+    <h2>Our cupcakes</h2>
+    <ul class="cupcakes-container"></ul>
+    <div class="add-cupcake-form-container">
+        <h2>Add a new cupcake</h2>
+        <form action="POST" id="new-cupcake-form">
+            <div class="input-container">
+                <label for="input-flavor">Flavor</label>
+                <input type="text" name="flavor" id="input-flavor">
+            </div>
+            <div class="input-container">
+                <label for="size">Size</label>
+                <input type="text" name="size" id="input-size">
+            </div>
+            <div class="input-container">
+                <label for="input-image">Image</label>
+                <input type="url" name="image" id="input-image">
+            </div>
+            <div class="input-container">
+                <label for="input-rating">Rating</label>
+                <input type="number" name="rating" id="input-rating">
+            </div>
             
-            <li class="pets-container">
-                <a class="pet-name link" href="/pets/{{ pet.id }}">
-                    <h3>{{ pet.name }}</h3>
-                    <img src="{{ pet.photo_url }}" alt="This is a photo of a pet named {{ pet.name }} and species {{ pet.species }}">
-                </a>
-                <p class="availability-tag success">Available</p>
-                <a href="/pets/{{ pet.id }}/edit">Edit</a>
-                <form action="/pets/{{ pet.id }}/delete" method="POST"><button class="warning">Delete</button></form>
-            </li>
-            {% endif %}
-            {% endfor %}
-        </ul>
-        
-        <ul class="unavailable-container">
-            {% for pet in pets %}
-
-            {% if not pet.available %}
-
-            <li class="pets-container">
-                <a class="pet-name link" href="/pets/{{ pet.id }}">
-                    <h3>{{ pet.name }}</h3>
-                    <img src="{{ pet.photo_url }}" alt="This is a photo of a pet named {{ pet.name }} and species {{ pet.species }}">
-                </a>
-                <p class="availability-tag warning">Not Available</p>
-                <a href="/pets/{{ pet.id }}/edit">Edit</a>
-                <form action="/pets/{{ pet.id }}/delete" method="POST"><button class="warning">Delete</button></form>
-            </li>
-            {% endif %}
-            {% endfor %}
-
-        </ul>
-
-        
-
-        
-    
-
-
+            <button>Create New Cupcake</button>
+        </form>
+    </div>
 
 {% endblock %}

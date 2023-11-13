@@ -15,10 +15,10 @@
 </head>
 <body>
 
-    <h1><a href="/">PetAdoption Agency</a></h1>
+    <h1><a href="/">Cupcakes Factory</a></h1>
     <div class="nav-bar">
-        <a href="/species">species</a>
-        <a href="/add">add pet</a>
+        <a href="/species">flavor</a>
+        <a href="/add">add cupcake</a>
     </div>
 
     {% with messages = get_flashed_messages(category_filter=["success"]) %}
@@ -31,5 +31,8 @@
     {% block content %}
 
     {% endblock %}
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
