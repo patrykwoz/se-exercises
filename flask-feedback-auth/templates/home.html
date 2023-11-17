@@ -4,6 +4,24 @@
 
 {% block content %}
     <h2>Users and Feedback</h2>
+
+    <div class="users-container">
+    {% for user in users %}
+    <div class="user-card">
+        <h3>{{ user.username }}</h3>
+        <div class="feedbacks-container">
+        {% for feedback in user.feedbacks %}
+        <div class="feedback-card"> {{ feedback.title }}</div>
+
+
+        {% endfor %}
+        </div>
+
+    </div>
+    {% endfor %}
+    </div>
+
+    
     
 
 {% endblock %}

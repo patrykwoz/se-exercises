@@ -1,22 +1,26 @@
 from app import app
-from models import db, Cupcake
+from models import db, User, Feedback
 
 
-db.drop_all()
-db.create_all()
+with app.app_context():
+    db.drop_all()
+    db.create_all()
 
-c1 = Cupcake(
-    flavor="cherry",
-    size="large",
-    rating=5,
-)
+    user_one = User.register(username="mackTheGreat", password="iamgreat", email="mack@mack.com", first_name="Mack", last_name="Mackowsky")
+    user_two = User.register(username="ryanTheBear", password="iambear", email="ryan@mack.com", first_name="Ryan", last_name="Polarbear")
 
-c2 = Cupcake(
-    flavor="chocolate",
-    size="small",
-    rating=9,
-    image="https://www.bakedbyrachel.com/wp-content/uploads/2018/01/chocolatecupcakesccfrosting1_bakedbyrachel.jpg"
-)
+    db.session.add_all([user_one, user_two])
+    db.session.commit()
 
-db.session.add_all([c1, c2])
-db.session.commit()
+    feedback_one = Feedback(
+    title="I am Great",
+    content="I was always great",
+    username="mackTheGreat"
+    )
+    feedback_two = Feedback(
+    title="Ryan is O.K.",
+    content="Sometimes lacking speed... and mumbles...",
+    username="mackTheGreat"
+    )
+    db.session.add_all([feedback_one, feedback_two])
+    db.session.commit()

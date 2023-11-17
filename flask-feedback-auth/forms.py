@@ -1,23 +1,34 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from werkzeug.utils import secure_filename
-from wtforms import StringField, FloatField, BooleanField, IntegerField, URLField, SelectField, TextAreaField
+from wtforms import StringField, FloatField, BooleanField, IntegerField, URLField, SelectField, TextAreaField, PasswordField, EmailField
 from wtforms.validators import InputRequired, Optional, Email, NumberRange, ValidationError
 
-def validate_one_of(form, field):
-    """Custom validator to ensure that either photo_url or photo_upload is provided, but not both."""
-    if field.data and form.photo_url.data:
-        raise ValidationError('Please provide either a photo URL or upload a photo, not both.')
+class RegisterForm(FlaskForm):
+    """Form for registering a user."""
 
+    username = StringField("Username", validators=[InputRequired(message="Input a valid username")])
+    password = PasswordField("Password", validators=[InputRequired(message="Input a valid password")])
+    email = EmailField("Email", validators=[InputRequired(message="Input a valid email"),Email()])
+    first_name = StringField("First Name", validators=[InputRequired(message="Input a valid first name")])
+    last_name = StringField("Last Name", validators=[InputRequired(message="Input a valid last name")])
+    
 
-class PetForm(FlaskForm):
-    """Form for adding/editing pet."""
+class LoginForm(FlaskForm):
+    """Form for loging in a user."""
 
-    name = StringField("Name", validators=[InputRequired(message="Input a valid name")])
-    species = StringField("Species", validators=[InputRequired(message="Input a valid species")])
-    photo_url = URLField("Photo URL", validators=[Optional(),validate_one_of])
-    photo_upload = FileField(validators=[Optional(), FileAllowed(['jpg', 'jpeg', 'png'], 'Images only!'), validate_one_of])
-    age = IntegerField("Age", validators=[InputRequired(message="Input a valid whole number"), NumberRange(min=0, max=30, message="Age must be between 0 and 30.")] )
-    available = SelectField("Availability", choices=[('True', 'Available'),  ('False', 'Not available')])
-    notes = TextAreaField("Notes", validators=[Optional()])
+    username = StringField("Username", validators=[InputRequired(message="Input a valid username")])
+    password = PasswordField("Password", validators=[InputRequired(message="Input a valid password")])
 
+class FeedbackForm(FlaskForm):
+    """Form for adding feedback by a user."""
+    title = StringField("Title", validators=[InputRequired(message="Input a valid title")])
+    content = TextAreaField("Content", validators=[InputRequired(message="Input a valid content")])
+
+class ResetPasswordForm(FlaskForm):
+    """Form for reseting password by a user."""
+    email = EmailField("Email", validators=[InputRequired(message="Input a valid email"),Email()])
+
+class SetPasswordForm(FlaskForm):
+    """Form for settingg password by a user with a token."""
+    password = PasswordField("New Password", validators=[InputRequired(message="Input a valid password")])

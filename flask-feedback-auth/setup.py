@@ -1,5 +1,4 @@
 from sqlalchemy.orm import sessionmaker
-#from app import app, db
 
 ctx = app.app_context()
 ctx.push()
