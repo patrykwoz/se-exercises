@@ -53,6 +53,7 @@ function makeBoard(boardString) {
 function find(board, word) {
   /** Can word be found in board? */
   // TODO
+  
 }
 
 // EXAMPLE TEST
