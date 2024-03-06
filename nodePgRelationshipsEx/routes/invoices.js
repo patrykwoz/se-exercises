@@ -47,10 +47,31 @@ router.post("/", async (req, res, next) => {
 router.put("/:id", async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { amt, paid } = req.body;
-        if (!amt) throw new ExpressError('Amount required', 400);
+        
+        if(!id || id<=0) throw new ExpressError('Invoice id required', 400);
 
-        const results = await db.query(`UPDATE invoices SET amt=$1, paid=$2 WHERE id=$3 RETURNING id, comp_code, amt, paid, add_date, paid_date`, [amt, paid, id]);
+        const { amt, paid } = req.body;
+        if (!amt || !paid) throw new ExpressError('Amount required', 400);
+        
+        let results;
+        let currentPaymentStatus = await db.query(`SELECT paid FROM invoices WHERE id = $1`, [id]);
+        if (paid===true && currentPaymentStatus.rows[0].paid===false) {
+            //If paying unpaid invoice: sets paid_date to today
+            results = await db.query(`
+            UPDATE invoices SET amt=$1, paid=$2, paid_date=CURRENT_DATE 
+            WHERE id=$3 RETURNING id, comp_code, amt, paid, add_date, paid_date`, [amt, paid, id]);
+        } else if (paid===false && currentPaymentStatus.rows[0].paid===true) {
+            //If un-paying: sets paid_date to null
+            results = await db.query(`
+            UPDATE invoices SET amt=$1, paid=$2, paid_date=null 
+            WHERE id=$3 RETURNING id, comp_code, amt, paid, add_date, paid_date`, [amt, paid, id]);
+        } else {
+            //If no change to payment status: just updates the amount
+            results = await db.query(`
+            UPDATE invoices SET amt=$1, paid=$2
+            WHERE id=$3 RETURNING id, comp_code, amt, paid, add_date, paid_date`, [amt, paid, id]);
+        }   
+        
         if (results.rows.length === 0) {
             throw new ExpressError(`No such invoice: ${id}`, 404);
         }
