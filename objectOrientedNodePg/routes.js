@@ -18,6 +18,17 @@ router.get("/", async function(req, res, next) {
   }
 });
 
+//** Show top 10 customers ordered by most reservations */
+
+router.get("/top-customers", async function(req, res, next) {
+  try {
+    const customers = await Customer.getTopCustomers();
+    return res.render("customer_list.html", { customers });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 /** Form to add a new customer. */
 
 router.get("/add/", async function(req, res, next) {
@@ -111,5 +122,19 @@ router.post("/:id/add-reservation/", async function(req, res, next) {
     return next(err);
   }
 });
+
+//** Handle customer search form post request */
+
+router.post("/search", async function(req, res, next) {
+  try {
+    const name = req.body.search;
+    const customers = await Customer.search(name);
+    return res.render("customer_list.html", { customers });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+
 
 module.exports = router;

@@ -6,12 +6,27 @@ const Reservation = require("./reservation");
 /** Customer of the restaurant. */
 
 class Customer {
+
+  #notes;
+
   constructor({ id, firstName, lastName, phone, notes }) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
     this.phone = phone;
     this.notes = notes;
+  }
+
+  get notes() {
+    return this.#notes;
+  }
+
+  set notes(val) {
+    if (val === null) {
+      this.#notes = "";
+    } else {
+      this.#notes = val;
+    }
   }
 
   /** find all customers. */
@@ -60,8 +75,43 @@ class Customer {
   }
 
   /** get full name of customer. */
+
   get fullName() {
     return `${this.firstName} ${this.lastName}`;
+  }
+
+  /** search customer by name. */
+  
+  static async search(name) {
+    const results = await db.query(
+      `SELECT id, 
+         first_name AS "firstName",  
+         last_name AS "lastName", 
+         phone, 
+         notes 
+        FROM customers 
+        WHERE first_name ILIKE $1 OR last_name ILIKE $1`,
+      [`%${name}%`]
+    );
+    return results.rows.map(c => new Customer(c));
+  }
+
+  /** get 10 top customers ordered by most reservations */
+
+  static async getTopCustomers() {
+    const results = await db.query(
+      `SELECT c.id, 
+         first_name AS "firstName",  
+         last_name AS "lastName", 
+         phone, 
+         c.notes 
+        FROM customers c
+        JOIN reservations r ON c.id = r.customer_id
+        GROUP BY c.id
+        ORDER BY COUNT(r.id) DESC
+        LIMIT 10`
+    );
+    return results.rows.map(c => new Customer(c));
   }
 
   /** save this customer. */
