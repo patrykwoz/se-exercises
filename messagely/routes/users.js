@@ -70,3 +70,5 @@ router.get("/:username/from", ensureLoggedIn, async function (req, res, next) {
         return next(err);
     }
 });
+
+module.exports = router;

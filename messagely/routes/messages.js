@@ -1,9 +1,6 @@
 const express = require("express");
 const router = new express.Router();
 const ExpressError = require("../expressError");
-const jwt = require("jsonwebtoken");
-const { SECRET_KEY } = require("../config");
-const User = require("../models/user");
 const Message = require("../models/message");
 const { ensureLoggedIn, ensureCorrectUser } = require("../middleware/auth");
 
@@ -63,4 +60,4 @@ router.post("/:id/read", ensureCorrectUser, async function (req, res, next) {
     }
 });
 
-
+module.exports = router;

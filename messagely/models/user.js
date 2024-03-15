@@ -17,11 +17,18 @@ class User {
   static async register({ username, password, first_name, last_name, phone }) {
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
     const result = await db.query(
-      `INSERT INTO users (username, password, first_name, last_name, phone, join_at, last_login_at)
-           VALUES ($1, $2, $3, $4, $5, current_timestamp, current_timestamp)
-           RETURNING username, password, first_name, last_name, phone`,
-      [username, hashedPassword, first_name, last_name, phone]);
-
+      `INSERT INTO users (
+        username,
+        password,
+        first_name,
+        last_name,
+        phone,
+        join_at,
+        last_login_at)
+      VALUES ($1, $2, $3, $4, $5, current_timestamp, current_timestamp)
+      RETURNING username, password, first_name, last_name, phone`,
+      [username, hashedPassword, first_name, last_name, phone]
+      );
     return result.rows[0];
   }
 
@@ -41,7 +48,7 @@ class User {
         return false;
       }
     }
-    throw new ExpressError(`No such user: ${username}`, 404);
+    throw new ExpressError(`No such user: ${username}`, 400);
   }
 
   /** Update last_login_at for user */
@@ -51,12 +58,11 @@ class User {
       `UPDATE users
            SET last_login_at = current_timestamp
            WHERE username = $1
-           RETURNING username, last_login_at`,
+           RETURNING username`,
       [username]);
     if (!result.rows[0]) {
-      throw new ExpressError(`No such user: ${username}`, 404);
+      throw new ExpressError(`No such user: ${username}`, 400);
     }
-    return result.rows[0];
   }
 
   /** All: basic info on all users:
@@ -65,7 +71,8 @@ class User {
   static async all() {
     const result = await db.query(
       `SELECT username, first_name, last_name, phone
-           FROM users`);
+           FROM users
+           ORDER BY username`);
     return result.rows;
   }
 
@@ -115,7 +122,7 @@ class User {
       read_at
     }));
   }
-  
+
 
   /** Return messages to this user.
    *
@@ -139,7 +146,7 @@ class User {
       body,
       sent_at,
       read_at
-    }));  
+    }));
   }
 }
 

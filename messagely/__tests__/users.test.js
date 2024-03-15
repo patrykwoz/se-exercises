@@ -1,21 +1,57 @@
+process.env.NODE_ENV = 'test';
+
+
 const db = require("../db");
 const User = require("../models/user");
 const Message = require("../models/message");
 
+beforeAll(async function () {
+  await db.query(`
+  DROP TABLE IF EXISTS users CASCADE;
+  DROP TABLE IF EXISTS messages CASCADE;
+  
+  CREATE TABLE users (
+      username text PRIMARY KEY,
+      password text NOT NULL,
+      first_name text NOT NULL,
+      last_name text NOT NULL,
+      phone text NOT NULL,
+      join_at timestamp without time zone NOT NULL,
+      last_login_at timestamp with time zone
+  );
+  
+  CREATE TABLE messages (
+      id SERIAL PRIMARY KEY,
+      from_username text NOT NULL REFERENCES users ON DELETE CASCADE,
+      to_username text NOT NULL REFERENCES users ON DELETE CASCADE,
+      body text NOT NULL,
+      sent_at timestamp with time zone NOT NULL,
+      read_at timestamp with time zone
+  );
+  
+  `);
+});
+
+beforeEach(async function () {
+  await db.query("DELETE FROM messages");
+  await db.query("DELETE FROM users");
+  await db.query("ALTER SEQUENCE messages_id_seq RESTART WITH 1");
+  let u = await User.register({
+    username: "test",
+    password: "password",
+    first_name: "Test",
+    last_name: "Testy",
+    phone: "+14155550000",
+  });
+});
+
+afterEach(async function () {
+  await db.query("DELETE FROM messages");
+  await db.query("DELETE FROM users");
+  await db.query("ALTER SEQUENCE messages_id_seq RESTART WITH 1");
+});
 
 describe("Test User class", function () {
-  beforeEach(async function () {
-    await db.query("DELETE FROM messages");
-    await db.query("DELETE FROM users");
-    let u = await User.register({
-      username: "test",
-      password: "password",
-      first_name: "Test",
-      last_name: "Testy",
-      phone: "+14155550000",
-    });
-  });
-
   test("can register", async function () {
     let u = await User.register({
       username: "joel",
@@ -32,7 +68,7 @@ describe("Test User class", function () {
     let isValid = await User.authenticate("test", "password");
     expect(isValid).toBeTruthy();
 
-    isValid =  await User.authenticate("test", "xxx");
+    isValid = await User.authenticate("test", "xxx");
     expect(isValid).toBeFalsy();
   });
 
@@ -135,6 +171,6 @@ describe("Test messages part of User class", function () {
   });
 });
 
-afterAll(async function() {
+afterAll(async function () {
   await db.end();
 });
